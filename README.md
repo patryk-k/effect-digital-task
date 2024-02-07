@@ -5,6 +5,7 @@
     - Apart from standard stuff there is:
         - `AWS_ROLE_ARN` - this needs to be an ARN of an IAM role with AmazonTextractServiceRole permission
         - `AWS_SNS_TOPIC_ARN` - this needs to be an ARN of an SNS topic. It can be empty. If it isn't that's where Textract will be sending progress updates.
+        - `AWS_SSO_PROFILE` - name of the AWS SSO profile to use ('default' if omitted), must be set up in `~/.aws/config`
 - Run `php artisan migrate`
 - Host in your usual way (via Herd for example)
 - It's ready for use
