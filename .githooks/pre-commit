@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+C_RESET='\e[0m'
+C_RED='\e[31m'
+C_GREEN='\e[32m'
+C_YELLOW='\e[33m'
+
+function __run()
+{
+    local color output exitcode
+
+    printf "${C_YELLOW}[%s]${C_RESET} %-20s" "$1" "$2"
+    output=$(eval "$3" 2>&1)
+    exitcode=$?
+
+    if [[ 0 == $exitcode || 130 == $exitcode ]]; then
+        printf "${C_GREEN}OK!${C_RESET}"
+        printf "%b\n"
+    else
+        printf "${C_RED}Not OK!${C_RESET}"
+        printf "%b\n"
+        printf "%s\n" "$output"
+        exit 1
+    fi
+}
+
+__run "1/1" "pint" "vendor/bin/pint"
