@@ -8,6 +8,8 @@ use Tests\TestCase;
 
 class CreateDocumentTest extends TestCase
 {
+    private $dateFormat = 'Y-m-d\TH:i:s.u\Z';
+
     /**
      * Test that a document can be created via the endpoint
      */
@@ -18,16 +20,16 @@ class CreateDocumentTest extends TestCase
         ]);
 
         /** @var Document */
-        $model = Document::find($response->viewData('data.id'));
+        $model = Document::find(json_decode($response->baseResponse->content())->data->id);
 
         $this->assertTrue(is_a($model, Document::class));
         $this->assertTrue($model->exists);
         $this->assertNotEmpty($model->request_time);
         $this->assertEquals($model->text, 'Dummy PDF file');
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $response->assertJsonPath('data.text', 'Dummy PDF file');
-        $response->assertJsonPath('data.request_time', $model->request_time);
+        $response->assertJsonPath('data.request_time', $model->request_time->format($this->dateFormat));
     }
 
     /**
@@ -40,16 +42,16 @@ class CreateDocumentTest extends TestCase
         ]);
 
         /** @var Document */
-        $model = Document::find($response->viewData('data.id'));
+        $model = Document::find(json_decode($response->baseResponse->content())->data->id);
 
         $this->assertTrue(is_a($model, Document::class));
         $this->assertTrue($model->exists);
         $this->assertNotEmpty($model->request_time);
         $this->assertEquals($model->text, '');
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $response->assertJsonPath('data.text', '');
-        $response->assertJsonPath('data.request_time', $model->request_time);
+        $response->assertJsonPath('data.request_time', $model->request_time->format($this->dateFormat));
     }
 
     /**
@@ -111,9 +113,6 @@ class CreateDocumentTest extends TestCase
 
     private function postDocument(array $data = [])
     {
-        return $this->post(route('documents.store'), $data, [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ]);
+        return $this->postJson(route('documents.store'), $data);
     }
 }
