@@ -17,7 +17,8 @@ class DocumentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'text' => $this->faker->words(3, true),
+            'request_time' => $this->faker->dateTime()
         ];
     }
 }
