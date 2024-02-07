@@ -33,25 +33,21 @@ class CreateDocumentTest extends TestCase
     }
 
     /**
-     * Test that an empty document can be created via the endpoint
+     * Test that an empty document cannot be created via the endpoint
      */
-    public function test_document_can_be_created_empty(): void
+    public function test_document_cannot_be_created_empty(): void
     {
+        $documentsCountBefore = Document::count();
+
         $response = $this->postDocument([
             'document' => base64_encode($this->getExample('blank'))
         ]);
 
-        /** @var Document */
-        $model = Document::find(json_decode($response->baseResponse->content())->data->id);
+        $response->assertStatus(422);
+        $response->assertJsonPath('message', 'The document provided is not a valid pdf file.');
+        $response->assertJsonPath('errors.document.0', 'The document provided is not a valid pdf file.');
 
-        $this->assertTrue(is_a($model, Document::class));
-        $this->assertTrue($model->exists);
-        $this->assertNotEmpty($model->request_time);
-        $this->assertEquals($model->text, '');
-
-        $response->assertStatus(201);
-        $response->assertJsonPath('data.text', '');
-        $response->assertJsonPath('data.request_time', $model->request_time->format($this->dateFormat));
+        $this->assertDatabaseCount('documents', $documentsCountBefore);
     }
 
     /**
