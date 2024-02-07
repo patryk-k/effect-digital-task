@@ -11,7 +11,7 @@ use Throwable;
 
 class ValidBase64Pdf implements ValidationRule
 {
-    const FAILURE_TEXT = 'The document provided is not a valid pdf file.';
+    public const FAILURE_TEXT = 'The document provided is not a valid pdf file.';
 
     /**
      * Run the validation rule.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDocumentRequest;
+use App\Http\Resources\DocumentResource;
 use App\Models\Document;
 use App\Rules\ValidBase64Pdf;
 use Aws\Credentials\CredentialProvider;
@@ -17,7 +18,7 @@ class StoreDocumentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function __invoke(StoreDocumentRequest $request): JsonResponse
+    public function __invoke(StoreDocumentRequest $request): JsonResponse|DocumentResource
     {
         /*
             The file needs to be processed from S3. The two Textract client function available to extract text are:
@@ -110,6 +111,6 @@ class StoreDocumentController extends Controller
                 'request_time' => $requestTime
             ]);
 
-        return new JsonResponse($document);
+        return DocumentResource::make($document);
     }
 }
