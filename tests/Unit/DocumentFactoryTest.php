@@ -16,6 +16,8 @@ class DocumentFactoryTest extends TestCase
 
         $this->assertTrue(is_a($model, Document::class));
         $this->assertTrue($model->exists);
+        $this->assertNotEmpty($model->request_time);
+        $this->assertNotEmpty($model->text);
     }
 
     /**
@@ -28,6 +30,8 @@ class DocumentFactoryTest extends TestCase
         foreach ($models as $_model) {
             $this->assertTrue(is_a($_model, Document::class));
             $this->assertTrue($_model->exists);
+            $this->assertNotEmpty($_model->request_time);
+            $this->assertNotEmpty($_model->text);
         }
     }
 }

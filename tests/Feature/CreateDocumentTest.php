@@ -17,15 +17,17 @@ class CreateDocumentTest extends TestCase
             'document' => base64_encode($this->getExample('example'))
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJsonPath('data.text', 'Dummy PDF file');
-
         /** @var Document */
         $model = Document::find($response->viewData('data.id'));
 
         $this->assertTrue(is_a($model, Document::class));
         $this->assertTrue($model->exists);
+        $this->assertNotEmpty($model->request_time);
         $this->assertEquals($model->text, 'Dummy PDF file');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.text', 'Dummy PDF file');
+        $response->assertJsonPath('data.request_time', $model->request_time);
     }
 
     /**
@@ -37,15 +39,17 @@ class CreateDocumentTest extends TestCase
             'document' => base64_encode($this->getExample('blank'))
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJsonPath('data.text', '');
-
         /** @var Document */
         $model = Document::find($response->viewData('data.id'));
 
         $this->assertTrue(is_a($model, Document::class));
         $this->assertTrue($model->exists);
+        $this->assertNotEmpty($model->request_time);
         $this->assertEquals($model->text, '');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.text', '');
+        $response->assertJsonPath('data.request_time', $model->request_time);
     }
 
     /**
