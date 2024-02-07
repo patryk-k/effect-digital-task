@@ -56,6 +56,12 @@ return [
             'throw' => true,
         ],
 
+        'test_examples' => [
+            'driver' => 'local',
+            'root' => base_path('tests/Examples'),
+            'throw' => false,
+        ],
+
     ],
 
     /*
