@@ -11,7 +11,7 @@ use Throwable;
 
 class ValidBase64Pdf implements ValidationRule
 {
-    private $failureText = 'The document provided is not a valid pdf file.';
+    const FAILURE_TEXT = 'The document provided is not a valid pdf file.';
 
     /**
      * Run the validation rule.
@@ -21,14 +21,14 @@ class ValidBase64Pdf implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if(!is_string($value)) {
-            $fail($this->failureText);
+            $fail(ValidBase64Pdf::FAILURE_TEXT);
             return;
         }
 
         $decoded = base64_decode($value, true);
 
         if($decoded === false) {
-            $fail($this->failureText);
+            $fail(ValidBase64Pdf::FAILURE_TEXT);
             return;
         }
 
@@ -44,7 +44,7 @@ class ValidBase64Pdf implements ValidationRule
             $pdf->setSourceFile($storage->path($fileName));
         } catch (Throwable $e) {
             $storage->delete($fileName);
-            $fail($this->failureText);
+            $fail(ValidBase64Pdf::FAILURE_TEXT);
             return;
         }
 

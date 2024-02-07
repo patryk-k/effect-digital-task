@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDocumentRequest;
 use App\Models\Document;
+use App\Rules\ValidBase64Pdf;
 use Aws\Credentials\CredentialProvider;
 use Aws\Textract\TextractClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class StoreDocumentController extends Controller
 {
@@ -29,9 +31,9 @@ class StoreDocumentController extends Controller
         $s3Disk = Storage::disk('s3');
         $fileName = Str::random() . '.pdf';
 
-        $s3Disk->put($fileName, $request->document);
+        $s3Disk->put($fileName, base64_decode($request->document));
 
-        $credentials = CredentialProvider::sso(config('services.aws_sso_profile'));
+        $credentials = CredentialProvider::sso(config('services.aws.sso_profile'));
 
         $textractClient = new TextractClient([
             'credentials' => $credentials
@@ -73,7 +75,7 @@ class StoreDocumentController extends Controller
                     $success = true;
 
                     foreach($getDocumentTextDetectionResult->get('Blocks') as $_block) {
-                        if(isset($_block['Text'])) {
+                        if(isset($_block['Text']) && ($_block['BlockType'] ?? null) == 'LINE') {
                             if(strlen($text) > 0) {
                                 $text .= ' ';
                             }
@@ -93,6 +95,12 @@ class StoreDocumentController extends Controller
         $s3Disk->deleteDirectory('textract_output/' . $jobId);
 
         if(!$success) {
+            if($getDocumentTextDetectionResult->get('StatusMessage') == 'INVALID_IMAGE_TYPE') {
+                throw ValidationException::withMessages([
+                    'document' => ValidBase64Pdf::FAILURE_TEXT
+                ]);
+            }
+
             return new JsonResponse(['message' => 'Something went wrong.'], 500);
         }
 

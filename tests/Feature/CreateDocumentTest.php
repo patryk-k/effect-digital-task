@@ -13,7 +13,7 @@ class CreateDocumentTest extends TestCase
      */
     public function test_document_can_be_created(): void
     {
-        $response = $this->post(route('documents.store'), [
+        $response = $this->postDocument([
             'document' => base64_encode($this->getExample('example'))
         ]);
 
@@ -35,7 +35,7 @@ class CreateDocumentTest extends TestCase
      */
     public function test_document_can_be_created_empty(): void
     {
-        $response = $this->post(route('documents.store'), [
+        $response = $this->postDocument([
             'document' => base64_encode($this->getExample('blank'))
         ]);
 
@@ -59,7 +59,7 @@ class CreateDocumentTest extends TestCase
     {
         $documentsCountBefore = Document::count();
 
-        $response = $this->post(route('documents.store'), [
+        $response = $this->postDocument([
             'document' => base64_encode($this->getExample('corrupted'))
         ]);
 
@@ -77,7 +77,7 @@ class CreateDocumentTest extends TestCase
     {
         $documentsCountBefore = Document::count();
 
-        $response = $this->post(route('documents.store'), [
+        $response = $this->postDocument([
             'document' => base64_encode($this->getExample('example', 'png'))
         ]);
 
@@ -95,7 +95,7 @@ class CreateDocumentTest extends TestCase
     {
         $documentsCountBefore = Document::count();
 
-        $response = $this->post(route('documents.store'));
+        $response = $this->postDocument();
 
         $response->assertStatus(422);
         $response->assertJsonPath('message', 'The document field is required.');
@@ -106,6 +106,14 @@ class CreateDocumentTest extends TestCase
 
     private function getExample(string $name, string $extension = 'pdf')
     {
-        return Storage::disk('test_examples')->get($name . $extension);
+        return Storage::disk('test_examples')->get($name . '.' . $extension);
+    }
+
+    private function postDocument(array $data = [])
+    {
+        return $this->post(route('documents.store'), $data, [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ]);
     }
 }
