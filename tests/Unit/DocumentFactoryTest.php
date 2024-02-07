@@ -25,7 +25,7 @@ class DocumentFactoryTest extends TestCase
     {
         $models = Document::factory()->count(3)->create();
 
-        foreach($models as $_model) {
+        foreach ($models as $_model) {
             $this->assertTrue(is_a($_model, Document::class));
             $this->assertTrue($_model->exists);
         }
